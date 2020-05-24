@@ -41,13 +41,12 @@ steps:
 - name: kaniko
   image: letfn/drone-kaniko
   settings:
-    args: --destination=letfn/python
+    args: --destination=defn/cutouts
     cache: true
     cache_repo: defn/cache
-    dockerfile: alt/Dockerfile
     password:
       from_secret: docker_password
-    repo: letfn/python
+    repo: defn/cutouts
     tag: latest
     username:
       from_secret: docker_username
@@ -77,7 +76,7 @@ kind: secret
 name: docker_username
 
 get:
-  path: kv/data/drone/common
+  path: kv/drone/common
   name: docker_username
 
 ---
@@ -85,7 +84,7 @@ kind: secret
 name: docker_password
 
 get:
-  path: kv/data/drone/common
+  path: kv/drone/common
   name: docker_password
 
 ---
@@ -93,7 +92,7 @@ kind: secret
 name: github_token
 
 get:
-  path: kv/data/drone/common
+  path: kv/drone/common
   name: github_token
 
 ---
