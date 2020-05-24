@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: docs
+.PHONY: docs cutout
 
 menu:
 	@perl -ne 'printf("%10s: %s\n","$$1","$$2") if m{^([\w+-]+):[^#]+#\s(.+)$$}' Makefile
@@ -34,8 +34,12 @@ requirements:
 	drone exec --pipeline $@
 
 cutout:
+	rm -rf cutout
 	cookiecutter --no-input --directory t/python gh:defn/cutouts \
 		organization="Cuong Chi Nghiem" \
 		project_name="cutouts" \
 		repo="defn/cutouts" \
 		repo_cache="defn/cache"
+	rsync -ia cutout/. .
+	rm -rf cutout
+	git difftool --tool=vimdiff -y
