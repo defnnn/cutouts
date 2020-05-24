@@ -1,0 +1,115 @@
+---
+kind: pipeline
+type: docker
+name: fmt
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: everything
+  image: letfn/drone
+  settings:
+    task: fmt
+
+---
+kind: pipeline
+type: docker
+name: lint
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: everything
+  image: letfn/drone
+  settings:
+    task: lint
+
+---
+kind: pipeline
+type: docker
+name: build
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: kaniko
+  image: letfn/drone-kaniko
+  settings:
+    args: --destination={{cookiecutter.repo}}
+    cache: true
+    cache_repo: {{cookiecutter.repo_cache}}
+    password:
+      from_secret: docker_password
+    repo: {{cookiecutter.repo}}
+    tag: latest
+    username:
+      from_secret: docker_username
+
+depends_on:
+- fmt
+- lint
+
+---
+kind: pipeline
+type: docker
+name: docs
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: local
+  image: letfn/drone-hugo
+
+depends_on:
+- build
+
+---
+kind: secret
+name: docker_username
+
+get:
+  path: kv/data/drone/common
+  name: docker_username
+
+---
+kind: secret
+name: docker_password
+
+get:
+  path: kv/data/drone/common
+  name: docker_password
+
+---
+kind: secret
+name: github_token
+
+get:
+  path: kv/data/drone/common
+  name: github_token
+
+---
+kind: pipeline
+type: docker
+name: requirements
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: everything
+  image: letfn/python
+  commands:
+  - . /app/venv/bin/activate
+  - pip-compile /drone/src/requirements.in -o /tmp/requirements.txt
+  - if test -w . ; then cp /tmp/requirements.txt requirements.txt; else diff requirements.txt /tmp/requirements.txt || true;  fi
+
+...
