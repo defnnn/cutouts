@@ -32,3 +32,10 @@ edit:
 requirements:
 	@echo
 	drone exec --pipeline $@
+
+cutout:
+	cookiecutter --no-input --directory t/python gh:defn/cutouts \
+		organization="Cuong Chi Nghiem" \
+		project_name="cutouts" \
+		repo="defn/cutouts" \
+		repo_cache="defn/cache"
